@@ -1,41 +1,64 @@
 # quiz-report
 
-Your quiz JSON files are sitting in a folder. This CLI walks that folder with
-`pathlib`, tallies the scores, and writes a markdown report. No dashboards.
-No cloud. Just files.
+Folder of scores in. Markdown out. No dashboard. No cloud. No feelings.
 
-Built by **Trench-Worker** — because someone has to grade the robots.
+`pathlib` walks a folder of quiz JSON. It tallies. It writes a report you can
+open in a text editor. Someone has to grade the robots.
 
-## Why this exists
+Python 3.10+. Tests exist. Slide decks do not.
 
-- Practice `Path.glob` / `iterdir` without inventing a startup
-- Packaging + venv habits that survive contact with real projects
-- A report you can actually open in a text editor
-
-## Quick start
+## Install
 
 ```bash
+git clone https://github.com/Trench-Worker/quiz-report.git
 cd quiz-report
-python -m venv .venv
+
+python3 -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
+
 pip install -e ".[dev]"
+```
 
-# Demo against the bundled samples
+Or skip the ritual:
+
+```bash
+PYTHONPATH=src python -m quiz_report --input data/samples --demo
+```
+
+## Run
+
+```bash
 python -m quiz_report --input data/samples --demo
+```
 
-# Or write a file
+That's the one. Bundled samples. Three quizzes. One of them is a D. The file did
+that to itself.
+
+Want a file instead of a terminal dump:
+
+```bash
 python -m quiz_report --input data/samples --output report.md
 ```
 
-## Sample input
+After install, `quiz-report` also works.
 
-Each JSON file looks like:
+| Flag | What it does |
+|------|----------------|
+| `--input PATH` | Folder of `*.json`. Required. Non-recursive. Everything else is ignored. |
+| `--output PATH` | Write the markdown here. |
+| `--demo` | Print to stdout. Also the default if you omit `--output`. |
+
+## Input
+
+Each file is one object. `score` and `total` are required. `quiz` and `grade`
+are optional. Missing grade? It invents one. That's the job.
 
 ```json
 {"quiz": "Python Basics", "score": 4, "total": 5, "grade": "B"}
 ```
 
-Drop more files in `--input` and re-run. The scanner only cares about `*.json`.
+Drop more `*.json` in `--input` and re-run. `.txt` files can sit there and think
+about what they've done.
 
 ## Tests
 
@@ -43,6 +66,19 @@ Drop more files in `--input` and re-run. The scanner only cares about `*.json`.
 pytest
 ```
 
+Covers the boring parts that matter: `letter_grade`, `load_result`,
+`find_result_files`, `summarize`, write-to-disk.
+
+## CI
+
+GitHub Actions. Ubuntu. Python 3.12. Installs `.[dev]`, runs `pytest`, then:
+
+```bash
+python -m quiz_report --input data/samples --demo
+```
+
+So the CLI still works when nobody is there to open the report.
+
 ## License
 
-MIT © 2026 Trench-Worker
+MIT. See [LICENSE](LICENSE).
